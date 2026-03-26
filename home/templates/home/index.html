@@ -5,7 +5,22 @@
     <div class="row justify-content-center text-center">
         <div class="col-md-8">
             <h1>Welcome to AutoCommit</h1>
-            <p class="lead">Enter your registration number to get started.</p>
+            <p class="lead">Enter your vehicle registration to discover services tailored to your car.</p>
+        </div>
+    </div>
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-6">
+            <form method="POST" action="{% url 'vehicle_lookup' %}">
+                {% csrf_token %}
+                <div class="input-group input-group-lg">
+                    <input type="text" class="form-control text-uppercase text-center fw-bold"
+                        name="registration" placeholder="Enter reg e.g. AB12 CDE"
+                        maxlength="8" required>
+                    <button type="submit" class="btn btn-dark">
+                        <i class="fas fa-search"></i> Look Up
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
