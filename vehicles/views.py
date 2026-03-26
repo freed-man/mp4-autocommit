@@ -52,3 +52,20 @@ def vehicle_lookup(request):
         return redirect('home')
 
     return redirect('home')
+
+
+def vehicle_detail(request):
+    """
+    Display vehicle details from the DVLA API lookup.
+    """
+    vehicle_data = request.session.get('vehicle_data')
+
+    if not vehicle_data:
+        messages.error(request, 'no vehicle data found. please look up a vehicle first.')
+        return redirect('home')
+
+    context = {
+        'vehicle': vehicle_data,
+    }
+
+    return render(request, 'vehicles/vehicle_detail.html', context)

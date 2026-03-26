@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="mb-4">Vehicle Details</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        {{ vehicle.yearOfManufacture }} {{ vehicle.make }}
+                    </h4>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Registration:</strong> {{ vehicle.registrationNumber }}</p>
+                            <p><strong>Colour:</strong> {{ vehicle.colour }}</p>
+                            <p><strong>Fuel Type:</strong> {{ vehicle.fuelType }}</p>
+                            <p><strong>Engine Size:</strong> {{ vehicle.engineCapacity|default:"N/A" }} cc</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Year:</strong> {{ vehicle.yearOfManufacture }}</p>
+                            <p><strong>MOT Status:</strong> {{ vehicle.motStatus|default:"N/A" }}</p>
+                            <p><strong>MOT Expiry:</strong> {{ vehicle.motExpiryDate|default:"N/A" }}</p>
+                            <p><strong>Tax Status:</strong> {{ vehicle.taxStatus|default:"N/A" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3">
+                <a href="{% url 'home' %}" class="btn btn-outline-dark">Look Up Another Vehicle</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
