@@ -1,7 +1,36 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from datetime import datetime, date
 import requests
 import os
+
+
+def format_date(date_string):
+    """
+    Convert API date strings to dd/mm/yyyy format.
+    """
+    if not date_string:
+        return None
+    try:
+        if 'T' in date_string:
+            dt = datetime.strptime(date_string[:10], '%Y-%m-%d')
+        else:
+            dt = datetime.strptime(date_string, '%Y-%m-%d')
+        return dt.strftime('%d/%m/%Y')
+    except ValueError:
+        return date_string
+
+
+def format_mileage(value):
+    """
+    Format mileage with commas e.g. 103449 -> 103,449
+    """
+    if not value:
+        return None
+    try:
+        return f"{int(value):,}"
+    except (ValueError, TypeError):
+        return value
 
 
 def get_mot_access_token():
@@ -143,10 +172,96 @@ def vehicle_detail(request):
         model = mot[0].get('model')
         mot_tests = mot[0].get('motTests', [])
 
+    # calculate mot days remaining/overdue
+    mot_days_text = ''
+    mot_expiry = dvla.get('motExpiryDate')
+    if mot_expiry:
+        try:
+            expiry_date = datetime.strptime(mot_expiry, '%Y-%m-%d').date()
+            delta = (expiry_date - date.today()).days
+            if delta > 0:
+                mot_days_text = f"{delta} days remaining"
+            elif delta == 0:
+                mot_days_text = "expires today"
+            else:
+                mot_days_text = f"{abs(delta)} days overdue"
+        except ValueError:
+            mot_days_text = ''
+
+    # calculate tax days remaining/overdue
+    tax_days_text = ''
+    tax_due = dvla.get('taxDueDate')
+    if tax_due:
+        try:
+            due_date = datetime.strptime(tax_due, '%Y-%m-%d').date()
+            delta = (due_date - date.today()).days
+            if delta > 0:
+                tax_days_text = f"{delta} days remaining"
+            elif delta == 0:
+                tax_days_text = "due today"
+            else:
+                tax_days_text = f"{abs(delta)} days overdue"
+        except ValueError:
+            tax_days_text = ''
+
+    # calculate how long current keeper has had the car
+    v5c_days_text = ''
+    v5c_date = dvla.get('dateOfLastV5CIssued')
+    if v5c_date:
+        try:
+            issued_date = datetime.strptime(v5c_date, '%Y-%m-%d').date()
+            delta = (date.today() - issued_date).days
+            years = delta // 365
+            months = (delta % 365) // 30
+            if years > 0 and months > 0:
+                v5c_days_text = (
+                    f"{years} year{'s' if years != 1 else ''}, "
+                    f"{months} month{'s' if months != 1 else ''}"
+                )
+            elif years > 0:
+                v5c_days_text = f"{years} year{'s' if years != 1 else ''}"
+            else:
+                v5c_days_text = f"{months} month{'s' if months != 1 else ''}"
+        except ValueError:
+            v5c_days_text = ''
+
+    # format dates for display
+    if dvla.get('motExpiryDate'):
+        dvla['motExpiryDateFormatted'] = format_date(dvla['motExpiryDate'])
+    if dvla.get('taxDueDate'):
+        dvla['taxDueDateFormatted'] = format_date(dvla['taxDueDate'])
+    if dvla.get('dateOfLastV5CIssued'):
+        dvla['v5cDateFormatted'] = format_date(dvla['dateOfLastV5CIssued'])
+
+    # format mot test dates and mileage, sort defects
+    for test in mot_tests:
+        test['completedDateFormatted'] = format_date(
+            test.get('completedDate', '')
+        )
+        if test.get('expiryDate'):
+            test['expiryDateFormatted'] = format_date(test['expiryDate'])
+        if test.get('odometerValue'):
+            test['mileageFormatted'] = format_mileage(
+                test['odometerValue']
+            )
+        # sort defects: majors first, then advisories
+        if test.get('defects'):
+            major_types = ['DANGEROUS', 'MAJOR', 'FAIL', 'PRS']
+            majors = [
+                d for d in test['defects'] if d.get('type') in major_types
+            ]
+            advisories = [
+                d for d in test['defects'] if d.get('type') not in major_types
+            ]
+            test['defects'] = majors + advisories
+
     context = {
         'dvla': dvla,
         'model': model,
         'mot_tests': mot_tests,
+        'mot_days_text': mot_days_text,
+        'tax_days_text': tax_days_text,
+        'v5c_days_text': v5c_days_text,
     }
 
     return render(request, 'vehicles/vehicle_detail.html', context)

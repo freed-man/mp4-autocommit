@@ -10,19 +10,58 @@
                     <h4 class="card-title">
                         {{ dvla.yearOfManufacture }} {{ dvla.make }}{% if model %} {{ model }}{% endif %}
                     </h4>
+                    <span class="badge bg-secondary">{{ dvla.colour }}</span>
+                    <span class="badge bg-secondary">{{ dvla.fuelType }}</span>
+                    {% if dvla.engineCapacity %}
+                    <span class="badge bg-secondary">{{ dvla.engineCapacity }} cc</span>
+                    {% endif %}
                     <hr>
                     <div class="row">
                         <div class="col-md-6">
                             <p><strong>Registration:</strong> {{ dvla.registrationNumber }}</p>
-                            <p><strong>Colour:</strong> {{ dvla.colour }}</p>
                             <p><strong>Fuel Type:</strong> {{ dvla.fuelType }}</p>
                             <p><strong>Engine Size:</strong> {{ dvla.engineCapacity|default:"N/A" }} cc</p>
+                            <p><strong>Year:</strong> {{ dvla.yearOfManufacture }}</p>
                         </div>
                         <div class="col-md-6">
-                            <p><strong>Year:</strong> {{ dvla.yearOfManufacture }}</p>
-                            <p><strong>MOT Status:</strong> {{ dvla.motStatus|default:"N/A" }}</p>
-                            <p><strong>MOT Expiry:</strong> {{ dvla.motExpiryDate|default:"N/A" }}</p>
-                            <p><strong>Tax Status:</strong> {{ dvla.taxStatus|default:"N/A" }}</p>
+                            <p>
+                                <strong>MOT:</strong>
+                                {% if dvla.motStatus == "Valid" %}
+                                <i class="fas fa-check-circle text-success"></i>
+                                <span class="text-success">Valid</span>
+                                {% if dvla.motExpiryDateFormatted %}
+                                <br><small class="text-muted">(expires {{ dvla.motExpiryDateFormatted }} — {{ mot_days_text }})</small>
+                                {% endif %}
+                                {% else %}
+                                <i class="fas fa-times-circle text-danger"></i>
+                                <span class="text-danger">{{ dvla.motStatus|default:"No details held" }}</span>
+                                {% if dvla.motExpiryDateFormatted %}
+                                <br><small class="text-muted">(expired {{ dvla.motExpiryDateFormatted }} — {{ mot_days_text }})</small>
+                                {% endif %}
+                                {% endif %}
+                            </p>
+                            <p>
+                                <strong>Tax:</strong>
+                                {% if dvla.taxStatus == "Taxed" %}
+                                <i class="fas fa-check-circle text-success"></i>
+                                <span class="text-success">Taxed</span>
+                                {% if dvla.taxDueDateFormatted %}
+                                <br><small class="text-muted">(due {{ dvla.taxDueDateFormatted }} — {{ tax_days_text }})</small>
+                                {% endif %}
+                                {% else %}
+                                <i class="fas fa-times-circle text-danger"></i>
+                                <span class="text-danger">{{ dvla.taxStatus|default:"No details held" }}</span>
+                                {% if dvla.taxDueDateFormatted %}
+                                <br><small class="text-muted">(expired {{ dvla.taxDueDateFormatted }} — {{ tax_days_text }})</small>
+                                {% endif %}
+                                {% endif %}
+                            </p>
+                            {% if dvla.v5cDateFormatted %}
+                            <p>
+                                <strong>V5C Issued:</strong> {{ dvla.v5cDateFormatted }}
+                                <br><small class="text-muted">(current keeper for approx. {{ v5c_days_text }})</small>
+                            </p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -35,27 +74,30 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <strong>{{ test.completedDate }}</strong>
-                            <span class="ms-2">{{ test.odometerValue|default:"N/A" }} {{ test.odometerUnit|default:"" }}</span>
+                            <strong>{{ test.completedDateFormatted }}</strong>
+                            {% if test.mileageFormatted %}
+                            <span class="ms-2 text-muted">— {{ test.mileageFormatted }} {{ test.odometerUnit|lower }}</span>
+                            {% endif %}
                         </div>
-                        <span class="badge {% if test.testResult == 'PASSED' %}bg-success{% else %}bg-danger{% endif %}">
-                            {{ test.testResult }}
-                        </span>
+                        {% if test.testResult == "PASSED" %}
+                        <span class="badge bg-success">PASSED</span>
+                        {% else %}
+                        <span class="badge bg-danger">FAILED</span>
+                        {% endif %}
                     </div>
-                    {% if test.rfrAndComments %}
-                    <ul class="mt-2 mb-0">
-                        {% for item in test.rfrAndComments %}
-                        <li class="{% if item.type == 'FAIL' %}text-danger{% elif item.type == 'ADVISORY' %}text-warning{% endif %}">
-                            {{ item.text }}
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
                     {% if test.defects %}
-                    <ul class="mt-2 mb-0">
+                    <ul class="mt-2 mb-0 list-unstyled">
                         {% for defect in test.defects %}
-                        <li class="{% if defect.type == 'FAIL' or defect.type == 'MAJOR' %}text-danger{% elif defect.type == 'ADVISORY' %}text-warning{% endif %}">
-                            {{ defect.text }}
+                        <li class="mb-1">
+                            {% if defect.type == "DANGEROUS" or defect.type == "MAJOR" or defect.type == "FAIL" or defect.type == "PRS" %}
+                            <i class="fas fa-times-circle text-danger"></i>
+                            <span class="text-danger">{{ defect.text }}</span>
+                            <span class="badge bg-danger">Major</span>
+                            {% else %}
+                            <i class="fas fa-exclamation-circle text-warning"></i>
+                            <span>{{ defect.text }}</span>
+                            <span class="badge bg-warning text-dark">Advisory</span>
+                            {% endif %}
                         </li>
                         {% endfor %}
                     </ul>
