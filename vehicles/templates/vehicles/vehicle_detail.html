@@ -8,25 +8,63 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">
-                        {{ vehicle.yearOfManufacture }} {{ vehicle.make }}
+                        {{ dvla.yearOfManufacture }} {{ dvla.make }}{% if model %} {{ model }}{% endif %}
                     </h4>
                     <hr>
                     <div class="row">
                         <div class="col-md-6">
-                            <p><strong>Registration:</strong> {{ vehicle.registrationNumber }}</p>
-                            <p><strong>Colour:</strong> {{ vehicle.colour }}</p>
-                            <p><strong>Fuel Type:</strong> {{ vehicle.fuelType }}</p>
-                            <p><strong>Engine Size:</strong> {{ vehicle.engineCapacity|default:"N/A" }} cc</p>
+                            <p><strong>Registration:</strong> {{ dvla.registrationNumber }}</p>
+                            <p><strong>Colour:</strong> {{ dvla.colour }}</p>
+                            <p><strong>Fuel Type:</strong> {{ dvla.fuelType }}</p>
+                            <p><strong>Engine Size:</strong> {{ dvla.engineCapacity|default:"N/A" }} cc</p>
                         </div>
                         <div class="col-md-6">
-                            <p><strong>Year:</strong> {{ vehicle.yearOfManufacture }}</p>
-                            <p><strong>MOT Status:</strong> {{ vehicle.motStatus|default:"N/A" }}</p>
-                            <p><strong>MOT Expiry:</strong> {{ vehicle.motExpiryDate|default:"N/A" }}</p>
-                            <p><strong>Tax Status:</strong> {{ vehicle.taxStatus|default:"N/A" }}</p>
+                            <p><strong>Year:</strong> {{ dvla.yearOfManufacture }}</p>
+                            <p><strong>MOT Status:</strong> {{ dvla.motStatus|default:"N/A" }}</p>
+                            <p><strong>MOT Expiry:</strong> {{ dvla.motExpiryDate|default:"N/A" }}</p>
+                            <p><strong>Tax Status:</strong> {{ dvla.taxStatus|default:"N/A" }}</p>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {% if mot_tests %}
+            <h3 class="mt-4 mb-3">MOT History</h3>
+            {% for test in mot_tests %}
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ test.completedDate }}</strong>
+                            <span class="ms-2">{{ test.odometerValue|default:"N/A" }} {{ test.odometerUnit|default:"" }}</span>
+                        </div>
+                        <span class="badge {% if test.testResult == 'PASSED' %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ test.testResult }}
+                        </span>
+                    </div>
+                    {% if test.rfrAndComments %}
+                    <ul class="mt-2 mb-0">
+                        {% for item in test.rfrAndComments %}
+                        <li class="{% if item.type == 'FAIL' %}text-danger{% elif item.type == 'ADVISORY' %}text-warning{% endif %}">
+                            {{ item.text }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% if test.defects %}
+                    <ul class="mt-2 mb-0">
+                        {% for defect in test.defects %}
+                        <li class="{% if defect.type == 'FAIL' or defect.type == 'MAJOR' %}text-danger{% elif defect.type == 'ADVISORY' %}text-warning{% endif %}">
+                            {{ defect.text }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+
             <div class="mt-3">
                 <a href="{% url 'home' %}" class="btn btn-outline-dark">Look Up Another Vehicle</a>
             </div>
