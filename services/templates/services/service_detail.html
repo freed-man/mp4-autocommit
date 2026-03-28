@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <a href="{% url 'services' %}" class="btn btn-outline-dark btn-sm mb-3">
+                <i class="fas fa-arrow-left"></i> Back to Services
+            </a>
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">{{ service.name }}</h3>
+                    <span class="badge bg-secondary mb-3">{{ service.category.friendly_name }}</span>
+                    <p>{{ service.description }}</p>
+                    <hr>
+                    <p class="fw-bold fs-4">From £{{ service.base_price }}</p>
+                    <p class="text-muted">
+                        <small>
+                            {% if service.fuel_types == "all" %}
+                            Available for all vehicle types
+                            {% elif service.fuel_types == "diesel" %}
+                            Diesel vehicles only
+                            {% elif service.fuel_types == "electric_hybrid" %}
+                            Electric and hybrid vehicles only
+                            {% elif service.fuel_types == "electric" %}
+                            Electric vehicles only
+                            {% elif service.fuel_types == "petrol_diesel" %}
+                            Petrol and diesel vehicles only
+                            {% elif service.fuel_types == "petrol_diesel_hybrid" %}
+                            Petrol, diesel and hybrid vehicles
+                            {% else %}
+                            {{ service.get_fuel_types_display }}
+                            {% endif %}
+                        </small>
+                    </p>
+                    <div class="alert alert-light border mt-3">
+                        <small>
+                            <i class="fas fa-shield-alt"></i>
+                            All work carried out using OEM-quality parts. Parts and labour
+                            covered by our warranty. Final price may vary depending on
+                            your vehicle's make, model, and specification.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

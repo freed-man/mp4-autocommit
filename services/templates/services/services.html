@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-3">
+            <h5 class="mb-3">Categories</h5>
+            <div class="list-group mb-4">
+                <a href="{% url 'services' %}"
+                    class="list-group-item list-group-item-action {% if not selected_category %}active{% endif %}">
+                    All Services
+                </a>
+                {% for category in categories %}
+                <a href="{% url 'services' %}?category={{ category.name }}"
+                    class="list-group-item list-group-item-action {% if selected_category == category %}active{% endif %}">
+                    {{ category.friendly_name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-9">
+            <h2 class="mb-4">
+                {% if selected_category %}
+                {{ selected_category.friendly_name }}
+                {% else %}
+                All Services
+                {% endif %}
+            </h2>
+            <div class="row">
+                {% for service in services %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ service.name }}</h5>
+                            <span class="badge bg-secondary mb-2">{{ service.category.friendly_name }}</span>
+                            <p class="card-text text-muted">{{ service.description|truncatewords:20 }}</p>
+                            <p class="fw-bold fs-5">From £{{ service.base_price }}</p>
+                            <a href="{% url 'service_detail' service.id %}" class="btn btn-outline-dark btn-sm">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <p class="text-muted">No services found in this category.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
