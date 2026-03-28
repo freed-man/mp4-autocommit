@@ -44,7 +44,6 @@ class Service(models.Model):
     image = CloudinaryField('image', default='placeholder')
     fuel_types = models.CharField(
         max_length=50, choices=FUEL_TYPE_CHOICES, default='all')
-    created_on = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['category', 'name']
