@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-lg-10 col-md-12">
             <h2 class="mb-4">Vehicle Details</h2>
             <div class="card">
                 <div class="card-body">
@@ -88,7 +88,7 @@
                     {% if test.defects %}
                     <ul class="mt-2 mb-0 list-unstyled">
                         {% for defect in test.defects %}
-                        <li class="mb-1">
+                        <li class="mb-1 mot-defect-item">
                             {% if defect.type == "DANGEROUS" or defect.type == "MAJOR" or defect.type == "FAIL" or defect.type == "PRS" %}
                             <i class="fas fa-times-circle text-danger"></i>
                             <span class="text-danger">{{ defect.text }}</span>

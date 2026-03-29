@@ -13,21 +13,29 @@ def add_to_bag(request, item_id):
     service = get_object_or_404(Service, pk=item_id)
     quantity = int(request.POST.get('quantity', 1))
     redirect_url = request.POST.get('redirect_url', '/')
+    reg = request.session.get('vehicle_reg', 'N/A')
     bag = request.session.get('bag', {})
 
     item_id = str(item_id)
 
-    if item_id in bag:
-        bag[item_id] += quantity
+    # create unique key combining service and reg
+    bag_key = f"{item_id}_{reg}"
+
+    if bag_key in bag:
+        bag[bag_key]['quantity'] += quantity
         messages.success(
             request,
-            f'updated {service.name} quantity to {bag[item_id]}'
+            f'updated {service.name} quantity for {reg}'
         )
     else:
-        bag[item_id] = quantity
+        bag[bag_key] = {
+            'service_id': int(item_id),
+            'quantity': quantity,
+            'reg': reg,
+        }
         messages.success(
             request,
-            f'added {service.name} to your bag'
+            f'added {service.name} for {reg} to your bag'
         )
 
     request.session['bag'] = bag
@@ -36,24 +44,18 @@ def add_to_bag(request, item_id):
 
 def adjust_bag(request, item_id):
     """Adjust the quantity of a service in the bag."""
-    service = get_object_or_404(Service, pk=item_id)
     quantity = int(request.POST.get('quantity', 0))
     bag = request.session.get('bag', {})
 
-    item_id = str(item_id)
+    bag_key = str(item_id)
 
-    if quantity > 0:
-        bag[item_id] = quantity
-        messages.success(
-            request,
-            f'updated {service.name} quantity to {bag[item_id]}'
-        )
-    else:
-        bag.pop(item_id, None)
-        messages.success(
-            request,
-            f'removed {service.name} from your bag'
-        )
+    if bag_key in bag:
+        if quantity > 0:
+            bag[bag_key]['quantity'] = quantity
+            messages.success(request, 'bag updated')
+        else:
+            del bag[bag_key]
+            messages.success(request, 'item removed from bag')
 
     request.session['bag'] = bag
     return redirect('view_bag')
@@ -61,16 +63,13 @@ def adjust_bag(request, item_id):
 
 def remove_from_bag(request, item_id):
     """Remove a service from the bag."""
-    service = get_object_or_404(Service, pk=item_id)
     bag = request.session.get('bag', {})
 
-    item_id = str(item_id)
+    bag_key = str(item_id)
 
-    bag.pop(item_id, None)
-    messages.success(
-        request,
-        f'removed {service.name} from your bag'
-    )
+    if bag_key in bag:
+        del bag[bag_key]
+        messages.success(request, 'item removed from bag')
 
     request.session['bag'] = bag
     return redirect('view_bag')

@@ -11,3 +11,19 @@ body {
 footer {
     margin-top: auto;
 }
+
+.mot-defect-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.mot-defect-item i {
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+}
+
+.mot-defect-item .badge {
+    flex-shrink: 0;
+    white-space: nowrap;
+}

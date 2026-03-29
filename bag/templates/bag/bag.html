@@ -9,6 +9,7 @@
             <thead class="table-dark">
                 <tr>
                     <th>Service</th>
+                    <th>Vehicle</th>
                     <th>Price</th>
                     <th>Qty</th>
                     <th>Subtotal</th>
@@ -22,9 +23,10 @@
                         <strong>{{ item.service.name }}</strong>
                         <br><small class="text-muted">{{ item.service.category.friendly_name }}</small>
                     </td>
+                    <td><span class="badge bg-dark">{{ item.reg }}</span></td>
                     <td>£{{ item.service.base_price }}</td>
                     <td>
-                        <form method="POST" action="{% url 'adjust_bag' item.item_id %}" class="d-inline">
+                        <form method="POST" action="{% url 'adjust_bag' item.bag_key %}" class="d-inline">
                             {% csrf_token %}
                             <div class="input-group" style="width: 120px;">
                                 <input type="number" name="quantity" value="{{ item.quantity }}"
@@ -37,7 +39,7 @@
                     </td>
                     <td>£{{ item.subtotal }}</td>
                     <td>
-                        <a href="{% url 'remove_from_bag' item.item_id %}" class="btn btn-sm btn-outline-danger">
+                        <a href="{% url 'remove_from_bag' item.bag_key %}" class="btn btn-sm btn-outline-danger">
                             <i class="fas fa-trash"></i>
                         </a>
                     </td>

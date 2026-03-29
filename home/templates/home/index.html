@@ -21,6 +21,14 @@
                     </button>
                 </div>
             </form>
+            {% if request.session.vehicle_reg %}
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    Last lookup: <strong>{{ request.session.vehicle_reg }}</strong> —
+                    <a href="{% url 'vehicle_detail' %}">view details</a>
+                </small>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
