@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Your Bag</h2>
+    {% if bag_items %}
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Service</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in bag_items %}
+                <tr>
+                    <td>
+                        <strong>{{ item.service.name }}</strong>
+                        <br><small class="text-muted">{{ item.service.category.friendly_name }}</small>
+                    </td>
+                    <td>£{{ item.service.base_price }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'adjust_bag' item.item_id %}" class="d-inline">
+                            {% csrf_token %}
+                            <div class="input-group" style="width: 120px;">
+                                <input type="number" name="quantity" value="{{ item.quantity }}"
+                                    min="0" max="10" class="form-control form-control-sm text-center">
+                                <button type="submit" class="btn btn-sm btn-outline-dark">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </td>
+                    <td>£{{ item.subtotal }}</td>
+                    <td>
+                        <a href="{% url 'remove_from_bag' item.item_id %}" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="row justify-content-end">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Bag Total: <strong>£{{ total }}</strong></h5>
+                    <a href="{% url 'services' %}" class="btn btn-outline-dark mt-2">
+                        <i class="fas fa-arrow-left"></i> Keep Browsing
+                    </a>
+                    <a href="#" class="btn btn-dark mt-2">
+                        <i class="fas fa-lock"></i> Checkout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <p class="text-muted">Your bag is empty.</p>
+    <a href="{% url 'services' %}" class="btn btn-outline-dark">
+        <i class="fas fa-arrow-left"></i> Browse Services
+    </a>
+    {% endif %}
+</div>
+{% endblock %}

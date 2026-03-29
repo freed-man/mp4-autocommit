@@ -33,6 +33,16 @@
                         <a class="nav-link" href="{% url 'services' %}">Services</a>
                     </li>
                 </ul>
+                <ul class="navbar-nav me-3">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'view_bag' %}">
+                            <i class="fas fa-shopping-bag"></i>
+                            {% if service_count %}
+                            <span class="badge bg-light text-dark">{{ service_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                </ul>
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                     <li class="nav-item">
@@ -84,7 +94,7 @@
 
     <script>
         setTimeout(function () {
-            let messages = document.getElementsByClassName('alert');
+            let messages = document.querySelectorAll('.alert-dismissible');
             for (let message of messages) {
                 message.style.transition = 'opacity 0.5s';
                 message.style.opacity = '0';
@@ -92,7 +102,7 @@
                     message.remove();
                 }, 500);
             }
-        }, 3000);
+        }, 5000);
     </script>
 
 </body>

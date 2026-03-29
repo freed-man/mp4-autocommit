@@ -270,3 +270,12 @@ def vehicle_detail(request):
     }
 
     return render(request, 'vehicles/vehicle_detail.html', context)
+
+def clear_vehicle(request):
+    """
+    Clear vehicle data from the session.
+    """
+    request.session.pop('vehicle_data', None)
+    request.session.pop('vehicle_fuel_type', None)
+    request.session.pop('vehicle_reg', None)
+    return redirect('services')

@@ -33,6 +33,20 @@
                             {% endif %}
                         </small>
                     </p>
+                    {% if available %}
+                    <form method="POST" action="{% url 'add_to_bag' service.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="quantity" value="1">
+                        <input type="hidden" name="redirect_url" value="{{ request.path }}">
+                        <button type="submit" class="btn btn-dark">
+                            <i class="fas fa-shopping-bag"></i> Add to Bag
+                        </button>
+                    </form>
+                    {% else %}
+                    <p class="text-muted">
+                        <i class="fas fa-ban"></i> This service is not available for your vehicle.
+                    </p>
+                    {% endif %}
                     <div class="alert alert-light border mt-3">
                         <small>
                             <i class="fas fa-shield-alt"></i>

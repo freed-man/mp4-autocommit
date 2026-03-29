@@ -3,9 +3,12 @@
 {% block content %}
 <div class="container mt-5">
     {% if vehicle_reg %}
-    <div class="alert alert-info mb-4">
-        <i class="fas fa-car"></i>
-        Showing services for <strong>{{ vehicle_reg }}</strong> ({{ vehicle_fuel_type }})
+    <div class="alert alert-info mb-4 d-flex justify-content-between align-items-center">
+        <span>
+            <i class="fas fa-car"></i>
+            Showing services for <strong>{{ vehicle_reg }}</strong> ({{ vehicle_fuel_type }})
+        </span>
+        <a href="{% url 'clear_vehicle' %}" class="btn btn-sm btn-outline-dark">Clear</a>
     </div>
     {% endif %}
     <div class="row">
