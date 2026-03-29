@@ -124,6 +124,11 @@ def vehicle_lookup(request):
                 }
 
                 request.session['vehicle_data'] = vehicle_info
+                # store fuel type for service filtering
+                request.session['vehicle_fuel_type'] = dvla_data.get(
+                    'fuelType', ''
+                ).upper()
+                request.session['vehicle_reg'] = registration
                 return redirect('vehicle_detail')
             elif response.status_code == 404:
                 messages.error(

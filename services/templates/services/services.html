@@ -2,6 +2,12 @@
 
 {% block content %}
 <div class="container mt-5">
+    {% if vehicle_reg %}
+    <div class="alert alert-info mb-4">
+        <i class="fas fa-car"></i>
+        Showing services for <strong>{{ vehicle_reg }}</strong> ({{ vehicle_fuel_type }})
+    </div>
+    {% endif %}
     <div class="row">
         <div class="col-md-3">
             <h5 class="mb-3">Categories</h5>
@@ -27,15 +33,21 @@
                 {% endif %}
             </h2>
             <div class="row">
-                {% for service in services %}
+                {% for item in services %}
                 <div class="col-md-6 mb-4">
-                    <div class="card h-100">
+                    <div class="card h-100 {% if not item.available %}opacity-50{% endif %}">
                         <div class="card-body">
-                            <h5 class="card-title">{{ service.name }}</h5>
-                            <span class="badge bg-secondary mb-2">{{ service.category.friendly_name }}</span>
-                            <p class="card-text text-muted">{{ service.description|truncatewords:20 }}</p>
-                            <p class="fw-bold fs-5">From £{{ service.base_price }}</p>
-                            <a href="{% url 'service_detail' service.id %}" class="btn btn-outline-dark btn-sm">View Details</a>
+                            <h5 class="card-title">{{ item.service.name }}</h5>
+                            <span class="badge bg-secondary mb-2">{{ item.service.category.friendly_name }}</span>
+                            <p class="card-text text-muted">{{ item.service.description|truncatewords:20 }}</p>
+                            <p class="fw-bold fs-5">From £{{ item.service.base_price }}</p>
+                            {% if item.available %}
+                            <a href="{% url 'service_detail' item.service.id %}" class="btn btn-outline-dark btn-sm">View Details</a>
+                            {% else %}
+                            <span class="text-muted">
+                                <small><i class="fas fa-ban"></i> Not available for your vehicle</small>
+                            </span>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
