@@ -134,26 +134,40 @@
         document.getElementById('submit-button').disabled = true;
         document.getElementById('loading-overlay').style.display = 'flex';
 
-        stripe.confirmCardPayment(clientSecret, {
-            payment_method: {
-                card: card,
-                billing_details: {
-                    name: form.full_name.value.trim(),
-                    phone: form.phone_number.value.trim(),
-                    email: form.email.value.trim(),
-                }
-            },
-        }).then(function(result) {
-            if (result.error) {
-                var errorDiv = document.getElementById('card-errors');
-                errorDiv.textContent = result.error.message;
-                card.update({'disabled': false});
-                document.getElementById('submit-button').disabled = false;
-                document.getElementById('loading-overlay').style.display = 'none';
+        var csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+        var postData = new FormData();
+        postData.append('csrfmiddlewaretoken', csrfToken);
+        postData.append('client_secret', clientSecret);
+
+        fetch('/checkout/cache_checkout_data/', {
+            method: 'POST',
+            body: postData,
+        }).then(function(response) {
+            if (response.ok) {
+                stripe.confirmCardPayment(clientSecret, {
+                    payment_method: {
+                        card: card,
+                        billing_details: {
+                            name: form.full_name.value.trim(),
+                            phone: form.phone_number.value.trim(),
+                            email: form.email.value.trim(),
+                        }
+                    },
+                }).then(function(result) {
+                    if (result.error) {
+                        var errorDiv = document.getElementById('card-errors');
+                        errorDiv.textContent = result.error.message;
+                        card.update({'disabled': false});
+                        document.getElementById('submit-button').disabled = false;
+                        document.getElementById('loading-overlay').style.display = 'none';
+                    } else {
+                        if (result.paymentIntent.status === 'succeeded') {
+                            form.submit();
+                        }
+                    }
+                });
             } else {
-                if (result.paymentIntent.status === 'succeeded') {
-                    form.submit();
-                }
+                location.reload();
             }
         });
     });
