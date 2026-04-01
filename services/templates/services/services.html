@@ -38,21 +38,21 @@
             <div class="row">
                 {% for item in services %}
                 <div class="col-md-6 mb-4">
-                    <div class="card h-100 {% if not item.available %}opacity-50{% endif %}">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ item.service.name }}</h5>
-                            <span class="badge bg-secondary mb-2">{{ item.service.category.friendly_name }}</span>
-                            <p class="card-text text-muted">{{ item.service.description|truncatewords:20 }}</p>
-                            <p class="fw-bold fs-5">From £{{ item.service.base_price }}</p>
-                            {% if item.available %}
-                            <a href="{% url 'service_detail' item.service.id %}" class="btn btn-outline-dark btn-sm">View Details</a>
-                            {% else %}
-                            <span class="text-muted">
-                                <small><i class="fas fa-ban"></i> Not available for your vehicle</small>
-                            </span>
-                            {% endif %}
+                    <a href="{% url 'service_detail' item.service.id %}" class="text-decoration-none">
+                        <div class="card h-100 {% if not item.available %}opacity-50{% endif %} service-card">
+                            <div class="card-body">
+                                <h5 class="card-title text-dark">{{ item.service.name }}</h5>
+                                <span class="badge bg-secondary mb-2">{{ item.service.category.friendly_name }}</span>
+                                <p class="card-text text-muted">{{ item.service.description|truncatewords:20 }}</p>
+                                <p class="fw-bold fs-5 text-dark">From £{{ item.service.base_price }}</p>
+                                {% if not item.available %}
+                                <span class="text-muted">
+                                    <small><i class="fas fa-ban"></i> Not available for your vehicle</small>
+                                </span>
+                                {% endif %}
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 {% empty %}
                 <div class="col-12">

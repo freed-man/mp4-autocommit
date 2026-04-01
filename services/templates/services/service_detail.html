@@ -33,7 +33,11 @@
                             {% endif %}
                         </small>
                     </p>
-                    {% if available %}
+                    {% if not request.session.vehicle_reg %}
+                    <a href="{% url 'home' %}" class="btn btn-outline-dark">
+                        <i class="fas fa-car"></i> Look up your vehicle first
+                    </a>
+                    {% elif available %}
                     <form method="POST" action="{% url 'add_to_bag' service.id %}">
                         {% csrf_token %}
                         <input type="hidden" name="quantity" value="1">

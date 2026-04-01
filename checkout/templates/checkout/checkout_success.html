@@ -19,7 +19,7 @@
                     {% for item in order.lineitems.all %}
                     <div class="d-flex justify-content-between mb-1">
                         <span>
-                            {{ item.service.name }} x{{ item.quantity }}
+                            <a href="{% url 'service_detail' item.service.id %}" class="text-dark">{{ item.service.name }}</a> x{{ item.quantity }}
                             {% if item.vehicle_reg %}
                             <small class="text-muted">({{ item.vehicle_reg }})</small>
                             {% endif %}

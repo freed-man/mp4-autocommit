@@ -9,6 +9,7 @@ class OrderForm(forms.ModelForm):
         fields = ('full_name', 'email', 'phone_number',)
 
     def __init__(self, *args, **kwargs):
+        read_only = kwargs.pop('read_only', False)
         super().__init__(*args, **kwargs)
         placeholders = {
             'full_name': 'Full Name',
@@ -21,3 +22,6 @@ class OrderForm(forms.ModelForm):
             placeholder = placeholders[field]
             self.fields[field].widget.attrs['placeholder'] = placeholder
             self.fields[field].label = False
+            if read_only:
+                self.fields[field].widget.attrs['readonly'] = True
+                self.fields[field].widget.attrs['class'] = 'form-control bg-light'

@@ -11,6 +11,7 @@ from bag.contexts import bag_contents
 import stripe
 import json
 
+
 @require_POST
 def cache_checkout_data(request):
     """Cache checkout data in Stripe PaymentIntent metadata."""
@@ -28,7 +29,6 @@ def cache_checkout_data(request):
             'sorry, your payment cannot be processed right now.'
         )
         return HttpResponse(content=e, status=400)
-
 
 
 def checkout(request):
@@ -98,11 +98,14 @@ def checkout(request):
         if request.user.is_authenticated:
             try:
                 profile = UserProfile.objects.get(user=request.user)
-                order_form = OrderForm(initial={
-                    'full_name': profile.user.get_full_name(),
-                    'email': profile.user.email,
-                    'phone_number': profile.default_phone_number,
-                })
+                order_form = OrderForm(
+                    initial={
+                        'full_name': profile.user.get_full_name(),
+                        'email': profile.user.email,
+                        'phone_number': profile.default_phone_number,
+                    },
+                    read_only=True,
+                )
             except UserProfile.DoesNotExist:
                 order_form = OrderForm()
         else:

@@ -13,7 +13,7 @@ def add_to_bag(request, item_id):
     service = get_object_or_404(Service, pk=item_id)
     quantity = int(request.POST.get('quantity', 1))
     redirect_url = request.POST.get('redirect_url', '/')
-    reg = request.session.get('vehicle_reg', 'N/A')
+    reg = request.session.get('vehicle_reg', 'NO-REG')
     bag = request.session.get('bag', {})
 
     item_id = str(item_id)
