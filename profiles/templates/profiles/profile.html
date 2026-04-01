@@ -4,20 +4,106 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-10">
             <h2 class="mb-4">My Profile</h2>
-            <div class="card">
-                <div class="card-body">
-                    <p><strong>Username:</strong> {{ profile.user.username }}</p>
-                    <p><strong>Email:</strong> {{ profile.user.email }}</p>
-                    <hr>
-                    <h5>Update Details</h5>
-                    <form method="POST">
-                        {% csrf_token %}
-                        {{ form | crispy }}
-                        <button type="submit" class="btn btn-dark">Update</button>
-                    </form>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">My Details</h5>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Email</label>
+                                <input type="email" class="form-control bg-light"
+                                    value="{{ profile.user.email }}" readonly>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle"></i>
+                                    To change email, please contact admin.
+                                </small>
+                            </div>
+                            <hr>
+                            <form method="POST">
+                                {% csrf_token %}
+                                {{ form | crispy }}
+                                <button type="submit" class="btn btn-dark btn-sm">Update</button>
+                            </form>
+                            <hr>
+                            <a href="{% url 'account_change_password' %}" class="btn btn-outline-dark btn-sm">
+                                <i class="fas fa-key"></i> Change Password
+                            </a>
+                            <button type="button" class="btn btn-outline-danger btn-sm"
+                                data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                                <i class="fas fa-trash"></i> Delete Account
+                            </button>
+                        </div>
+                    </div>
                 </div>
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Order History</h5>
+                            {% if orders %}
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Order Number</th>
+                                            <th>Date</th>
+                                            <th>Items</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in orders %}
+                                        <tr>
+                                            <td>
+                                                <a href="{% url 'order_history' order.order_number %}">
+                                                    <span class="d-none d-lg-inline">{{ order.order_number }}</span>
+                                                    <span class="d-lg-none">{{ order.order_number|truncatechars:10 }}</span>
+                                                </a>
+                                            </td>
+                                            <td>{{ order.date|date:"d/m/Y" }}</td>
+                                            <td>{{ order.lineitems.count }}</td>
+                                            <td>£{{ order.order_total }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <p class="text-muted">No orders yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteAccountModal" tabindex="-1"
+    aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAccountModalLabel">Delete Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete your account? This will permanently remove:</p>
+                <ul>
+                    <li>Your profile and personal details</li>
+                    <li>All order history</li>
+                    <li>All saved data</li>
+                </ul>
+                <p class="text-danger fw-bold">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                <form method="POST" action="{% url 'delete_account' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete My Account</button>
+                </form>
             </div>
         </div>
     </div>
