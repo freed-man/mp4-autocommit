@@ -6,8 +6,8 @@ from .models import UserProfile
 class UserProfileForm(forms.ModelForm):
     """Form for users to update their editable profile fields."""
     username = forms.CharField(max_length=150, required=True)
-    first_name = forms.CharField(max_length=30, required=False)
-    last_name = forms.CharField(max_length=30, required=False)
+    first_name = forms.CharField(max_length=30, required=True)
+    last_name = forms.CharField(max_length=30, required=True)
 
     class Meta:
         model = UserProfile
@@ -19,6 +19,8 @@ class UserProfileForm(forms.ModelForm):
             self.fields['username'].initial = self.instance.user.username
             self.fields['first_name'].initial = self.instance.user.first_name
             self.fields['last_name'].initial = self.instance.user.last_name
+
+        self.fields['default_phone_number'].required = True
 
         self.field_order = [
             'username', 'first_name', 'last_name', 'default_phone_number'
