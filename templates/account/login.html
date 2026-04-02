@@ -6,14 +6,26 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             <h2 class="text-center mb-4">Sign In</h2>
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                The username, email and/or password you entered are not correct. Please try again.
+            </div>
+            {% endif %}
             <form method="POST" action="{% url 'account_login' %}">
                 {% csrf_token %}
-                {{ form | crispy }}
+                {{ form.login | as_crispy_field }}
+                {{ form.password | as_crispy_field }}
+                {% if form.remember %}
+                {{ form.remember | as_crispy_field }}
+                {% endif %}
                 <div class="d-grid">
                     <button type="submit" class="btn btn-dark btn-lg">Sign In</button>
                 </div>
             </form>
             <p class="text-center mt-3">
+                <a href="{% url 'account_reset_password' %}">Forgot your password?</a>
+            </p>
+            <p class="text-center">
                 Don't have an account? <a href="{% url 'account_signup' %}">Register here</a>
             </p>
         </div>
